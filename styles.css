@@ -1,0 +1,39 @@
+@import "/lib/highlightjs/styles/tomorrow-night.css";
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  --content-width: 720px;
+}
+
+body {
+  margin: 0;
+  font-family: Verdana;
+  font-size: 20px;
+  color: #313131;
+  background-color: #f8f8f8;
+}
+
+/* for code sections */
+pre {
+    overflow-x: scroll;
+    background-color: #333333;
+    font-size: 0.8em;
+}
+
+.post__title {
+  font-size: 54px;
+  font-weight: bold;
+}
+
+.content {
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.image {
+  max-width: var(--content-width);
+  border: 2px solid #bbbbbb;
+}
