@@ -13,7 +13,7 @@ body {
   font-family: Verdana;
   font-size: 20px;
   color: #313131;
-  background-color: #f8f8f8;
+  background-color: #fcfcfc;
 }
 
 /* for code sections */
@@ -36,4 +36,12 @@ pre {
 .image {
   max-width: var(--content-width);
   border: 2px solid #bbbbbb;
+}
+
+.moosedrive-ad {
+  border: 2px solid #bbbbbb;
+}
+
+.moosedrive-ad__text {
+  margin: 20px 20px 0px 20px;
 }
