@@ -4,14 +4,148 @@ const config = {
   //entriesLocation: 'https://anderspitman.net/entries',
 };
 
-const postMap = {
-  'dependencies': '11',
-  'rust': '10',
-};
+const routes = [
+  {
+    name: 'Home',
+    path: '/',
+  },
+  {
+    name: 'Blog',
+    path: '/blog/',
+  },
+];
+
+const postConfig = [
+  {
+    routeName: 'dependencies',
+    entryId: '11',
+  },
+];
+
+const posts = [
+];
+
 
 const HomeView = () => {
   const dom = document.createElement('div');
-  dom.innerText = "Hi there";
+  dom.classList.add('home');
+
+  dom.innerHTML = `
+    <p>
+      MooseDrive is a <strong>data ownership</strong> company. Owning your data
+      is about more than legal definitions of property. Ownership is about
+      being able store, organize, view, listen to, stream, download, share,
+      publish, move, back up, and delete your data in ways that are simple,
+      intuitive, fast, flexible, and affordable.
+    </p>
+
+    <ul>
+      <li>
+        What if you could stream video from your Google Drive?
+      </li>
+      <li>
+        What if you could easily take any file from your Google Drive or
+        Dropbox, and host it on your website without ever having to copy it
+        to your CMS?
+      </li>
+      <li>
+        What if Google Drive WAS your CMS?
+      </li>
+      <li>
+        What if you could store those files on a USB drive or extra smartphone
+        plugged in at home, and still have them available publicly on the
+        web for sharing and streaming?
+      </li>
+      <li>
+        What if you could share private photo albums, notes, and even full web
+        sites with specific people and groups, without them needing to sign up
+        for yet another account?
+      </li>
+    </ul>
+
+    <p>
+      This is what we're building. There's a lot of work still left to do, but
+      we're close to a useful beta product. Join the newsletter to stay in the
+      loop. Exciting things are coming.
+    </p>
+  `;
+
+  dom.appendChild(NewsletterSignupView());
+
+  return dom;
+};
+
+
+const NavbarView = (routes) => {
+  const dom = document.createElement('div');
+  dom.classList.add('navbar');
+
+  for (const route of routes) {
+    dom.appendChild(NavbarLinkView(route));
+  }
+
+  return dom;
+};
+
+
+const NavbarLinkView = (route) => {
+  const dom = document.createElement('span');
+  dom.classList.add('navbar-link');
+
+  const link = document.createElement('a');
+  link.classList.add('navbar-link__link');
+
+  link.setAttribute('href', route.path);
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    dom.dispatchEvent(new CustomEvent('route-clicked', {
+      bubbles: true,
+      detail: {
+        route,
+      },
+    }));
+
+  });
+  link.innerText = route.name;
+  dom.appendChild(link);
+
+  return dom;
+};
+
+
+const BlogView = (posts) => {
+  const dom = document.createElement('div');
+  dom.classList.add('blog');
+
+  const header = document.createElement('h1');
+  header.innerText = "Posts";
+  dom.appendChild(header);
+
+  const list = document.createElement('ul');
+  dom.appendChild(list);
+
+  for (const post of posts) {
+    const postEl = document.createElement('li');
+    postEl.classList.add('post');
+    const link = document.createElement('a');
+    link.setAttribute('href', post.routeName + '/');
+    link.innerText = `${post.title} | ${post.date}`;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      dom.dispatchEvent(new CustomEvent('route-clicked', {
+        bubbles: true,
+        detail: {
+          route: {
+            path: `/blog/${post.routeName}/`,
+          },
+        },
+      }));
+    });
+    postEl.appendChild(link);
+    list.appendChild(postEl);
+  }
+
   return dom;
 };
 
@@ -26,7 +160,6 @@ const PostView = (postUrl) => {
 
   const promise = Promise.all([contentPromise, manfsPromise])
     .then(([content, manfs]) => {
-      console.log(manfs);
 
       const meta = manfs.appData;
 
@@ -103,8 +236,51 @@ const NewsletterSignupView = () => {
   return dom;
 };
 
+const root = document.createElement('div');
+root.classList.add('root');
+document.body.appendChild(root);
+
+
+
+(async () => {
+
+  const entriesResult = await fetch(config.entriesLocation + '/');
+  const entries = await entriesResult.json();
+
+  for (const post of postConfig) {
+    const entry = entries.children[post.entryId];
+
+    posts.push({
+      routeName: post.routeName,
+      title: entry.metadata.title,
+      date: entry.metadata.date,
+    });
+  }
+
+  const navbar = NavbarView(routes);
+  root.appendChild(navbar);
+  root.addEventListener('route-clicked', (e) => {
+    window.history.pushState({}, "", e.detail.route.path);
+    navigate();
+  });
+
+  marked.setOptions({
+    highlight: function(code, lang) {
+      const highlighted = hljs.highlightAuto(code);
+      return highlighted.value;
+    },
+  });
+
+  navigate();
+
+  window.addEventListener('popstate', (e) => {
+    navigate();
+  });
+
+})();
+
+
 async function navigate() {
-  const root = document.body;
   
   const oldContent = root.querySelector('.content');
   if (oldContent) {
@@ -121,21 +297,19 @@ async function navigate() {
     content.appendChild(HomeView());
   }
   else if (window.location.pathname === config.rootPath + 'blog/') {
-    content.innerText = "blog";
+    content.appendChild(BlogView(posts));
   }
   else if (pathName.startsWith(config.rootPath + 'blog/')) {
     const postName = pathName.split('/')[2];
-    const postUrl = config.entriesLocation + '/' + postMap[postName];
+
+    let post;
+    for (const conf of postConfig) {
+      if (conf.routeName === postName) {
+        post = conf;
+      }
+    }
+
+    const postUrl = config.entriesLocation + '/' + post.entryId;
     content.appendChild(PostView(postUrl));
   }
 }
-
-marked.setOptions({
-  highlight: function(code, lang) {
-    const highlighted = hljs.highlightAuto(code);
-    //console.log(highlighted);
-    return highlighted.value;
-  },
-});
-
-navigate();

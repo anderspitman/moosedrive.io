@@ -6,13 +6,14 @@ html {
 *, *:before, *:after {
   box-sizing: inherit;
   --content-width: 720px;
+  --main-text-color: #313131;
 }
 
 body {
   margin: 0;
   font-family: Verdana;
   font-size: 20px;
-  color: #313131;
+  color: var(--main-text-color);
   background-color: #fcfcfc;
 }
 
@@ -23,12 +24,31 @@ pre {
     font-size: 0.8em;
 }
 
+li {
+  margin: 10px 0;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+.navbar-link__link {
+  font-size: 30px;
+  font-weight: bold;
+  margin-right: 15px;
+  color: var(--main-text-color);
+}
+
 .post__title {
   font-size: 54px;
   font-weight: bold;
 }
 
-.content {
+.post {
+  font-size: 28px;
+}
+
+.root {
   max-width: var(--content-width);
   margin: 0 auto;
 }
