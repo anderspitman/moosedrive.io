@@ -1,7 +1,7 @@
 const config = {
   rootPath: '/',
-  entriesLocation: 'http://localhost:9001/entries',
-  //entriesLocation: 'https://anderspitman.net/entries',
+  //entriesLocation: 'http://localhost:9001/entries',
+  entriesLocation: 'https://anderspitman.net/entries',
 };
 
 const routes = [
@@ -22,8 +22,7 @@ const postConfig = [
   },
 ];
 
-const posts = [
-];
+const posts = [];
 
 
 const HomeView = () => {
@@ -171,30 +170,23 @@ const BlogView = (posts) => {
 };
 
 
-const PostView = (postUrl) => {
+const PostView = (post) => {
+  console.log(post);
   const dom = document.createElement('div');
 
-  const contentPromise = fetch(postUrl + '/entry.md')
-    .then(result => result.text());
-  const manfsPromise = fetch(postUrl + '/manfs.json')
-    .then(result => result.json());
+  post.contentPromise.then((content) => {
 
-  const promise = Promise.all([contentPromise, manfsPromise])
-    .then(([content, manfs]) => {
+    const title = document.createElement('div');
+    title.classList.add('post__title');
+    title.innerText = post.title;
+    dom.appendChild(title);
 
-      const meta = manfs.appData;
+    const postContent = document.createElement('div');
+    postContent.innerHTML = marked(content);
+    dom.appendChild(postContent);
 
-      const title = document.createElement('div');
-      title.classList.add('post__title');
-      title.innerText = meta.title;
-      dom.appendChild(title);
-
-      const postContent = document.createElement('div');
-      postContent.innerHTML = marked(content);
-      dom.appendChild(postContent);
-
-      dom.appendChild(MooseDriveAdView());
-    });
+    dom.appendChild(MooseDriveAdView());
+  });
 
   return dom;
 };
@@ -276,21 +268,31 @@ root.classList.add('root');
 document.body.appendChild(root);
 
 
+let entriesPromise;
 
 (async () => {
 
   const entriesResult = await fetch(config.entriesLocation + '/');
-  const entries = await entriesResult.json();
+  entriesPromise = entriesResult.json();
 
-  for (const post of postConfig) {
-    const entry = entries.children[post.entryId];
+  entriesPromise.then((entries) => {
 
-    posts.push({
-      routeName: post.routeName,
-      title: entry.metadata.title,
-      date: entry.metadata.date,
-    });
-  }
+    for (const post of postConfig) {
+      const entry = entries.children[post.entryId];
+
+      const contentUrl = config.entriesLocation + '/' + post.entryId + '/' + entry.metadata.contentFilename;
+      const contentPromise = fetch(contentUrl)
+        .then(response => response.text());
+
+      posts.push({
+        entryId: post.entryId,
+        routeName: post.routeName,
+        title: entry.metadata.title,
+        date: entry.metadata.date,
+        contentPromise,
+      });
+    }
+  });
 
   const navbar = NavbarView(routes);
   root.appendChild(navbar);
@@ -332,20 +334,21 @@ async function navigate() {
     content.appendChild(HomeView());
   }
   else if (window.location.pathname === config.rootPath + 'blog/') {
+    await entriesPromise;
     content.appendChild(BlogView(posts));
   }
   else if (pathName.startsWith(config.rootPath + 'blog/')) {
+    await entriesPromise;
     const postName = pathName.split('/')[2];
 
     let post;
-    for (const conf of postConfig) {
-      if (conf.routeName === postName) {
-        post = conf;
+    for (const p of posts) {
+      if (p.routeName === postName) {
+        post = p;
       }
     }
 
-    const postUrl = config.entriesLocation + '/' + post.entryId;
-    content.appendChild(PostView(postUrl));
+    content.appendChild(PostView(post));
   }
 
   window.scrollTo(0, 0);
