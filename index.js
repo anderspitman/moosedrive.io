@@ -49,24 +49,26 @@ const HomeView = () => {
         to your CMS?
       </li>
       <li>
-        What if Google Drive WAS your CMS?
-      </li>
-      <li>
-        What if you could store those files on a USB drive or extra smartphone
-        plugged in at home, and still have them available publicly on the
-        web for sharing and streaming?
+        What if Google Drive <em>was</em> your CMS?
       </li>
       <li>
         What if you could share private photo albums, notes, and even full web
         sites with specific people and groups, without them needing to sign up
         for yet another account?
       </li>
+      <li>
+				What if you could store your files on a USB drive or extra smartphone
+				plugged in at home, and still have them available publicly on the web
+				for sharing and streaming?
+      </li>
     </ul>
 
     <p>
-      This is what we're building. There's a lot of work still left to do, but
-      we're close to a useful beta product. Join the newsletter to stay in the
-      loop. Exciting things are coming.
+			This is what we're building. There's a lot of work still left to do, but
+			we're close to a useful beta product. Join the newsletter to stay in the
+			loop, or email us at
+			<a href='mailto:info@moosedrive.io'>info@moosedrive.io</a>. Exciting
+			things are coming.
     </p>
   `;
 
@@ -79,6 +81,25 @@ const HomeView = () => {
 const NavbarView = (routes) => {
   const dom = document.createElement('div');
   dom.classList.add('navbar');
+
+  const logoLink = document.createElement('a');
+  logoLink.setAttribute('href', '/');
+	const logo = document.createElement('img');
+	logo.classList.add('navbar__logo', 'navbar-link');
+	logo.src = '/remus_logo.png';
+  logo.addEventListener('click', (e) => {
+    e.preventDefault();
+    dom.dispatchEvent(new CustomEvent('route-clicked', {
+      bubbles: true,
+      detail: {
+        route: {
+          path: '/',
+        },
+      },
+    }));
+  });
+  logoLink.appendChild(logo);
+	dom.appendChild(logoLink);
 
   for (const route of routes) {
     dom.appendChild(NavbarLinkView(route));
@@ -186,15 +207,29 @@ const MooseDriveAdView = () => {
   const adHtml = `
     <p class='moosedrive-ad__text'>
       MooseDrive is rethinking data storage, sharing, and publishing. We're
-      planning to launch our closed beta soon. Join the newsletter to reserve
-      your spot.  <a href='https://moosedrive.io/' target='_blank'>Learn
-      more.</a>
+      planning to launch our closed beta soon. Join the newsletter to stay
+			up to date. <a class='moosedrive-ad__link' href='/'>Learn more.</a>
     </p>
   `;
 
   const adText = document.createElement('div');
   adText.innerHTML = adHtml;
   dom.appendChild(adText);
+
+  const link = dom.querySelector('.moosedrive-ad__link');
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    dom.dispatchEvent(new CustomEvent('route-clicked', {
+      bubbles: true,
+      detail: {
+        route: {
+          path: '/',
+        },
+      },
+    }));
+
+  });
 
   dom.appendChild(NewsletterSignupView());
   return dom;
@@ -312,4 +347,6 @@ async function navigate() {
     const postUrl = config.entriesLocation + '/' + post.entryId;
     content.appendChild(PostView(postUrl));
   }
+
+  window.scrollTo(0, 0);
 }

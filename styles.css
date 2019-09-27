@@ -29,13 +29,27 @@ li {
 }
 
 .navbar {
-  margin-bottom: 20px;
+  height: 64px;
+  display: flex;
+  border: 1px solid #000;
+}
+
+.navbar__logo {
+  width: 60px;
+}
+
+.navbar-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .navbar-link__link {
   font-size: 30px;
   font-weight: bold;
-  margin-right: 15px;
   color: var(--main-text-color);
 }
 
