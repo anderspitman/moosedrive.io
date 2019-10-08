@@ -40,20 +40,19 @@ const HomeView = () => {
 
     <ul>
       <li>
-        What if you could stream video from your Google Drive?
+        What if you could stream video from your cloud storage?
       </li>
       <li>
-        What if you could easily take any file from your Google Drive or
-        Dropbox, and host it on your website without ever having to copy it
-        to your CMS?
+        What if you could easily take any file from your cloud storage, and
+        host it on your website without ever having to copy it to your CMS?
       </li>
       <li>
-        What if Google Drive <em>was</em> your CMS?
+        What if your cloud storage <em>was</em> your CMS?
       </li>
       <li>
         What if you could share private photo albums, notes, and even full web
-        sites with specific people and groups, without them needing to sign up
-        for yet another account?
+        sites and apps with specific people and groups, without them needing to
+        sign up for yet another account?
       </li>
       <li>
 				What if you could store your files on a USB drive or extra smartphone
